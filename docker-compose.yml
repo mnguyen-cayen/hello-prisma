@@ -1,0 +1,45 @@
+version: "3.3"
+
+services:
+  app-redis:
+    image: redis:6.0
+    container_name: app-redis
+    restart: always
+    command: >
+      --requirepass ${REDIS_PASSWORD:-secret}
+    volumes:
+      - app-redis-data:/data
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    networks:
+      - app
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  app-database:
+    build:
+      context: ./docker/database
+      dockerfile: ./Dockerfile
+    container_name: app-database
+    restart: always
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-transact_db}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-secret}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-secret}
+      - MYSQL_USER=${MYSQL_USER:-transact_admin}
+    volumes:
+      - app-database-data:/var/lib/mysql
+    ports:
+      - ${MYSQL_PORT:-3306}:3306
+    networks:
+      - app
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+volumes:
+  app-database-data: null
+  app-redis-data: null
+
+networks:
+  app: null
+  app-test: null

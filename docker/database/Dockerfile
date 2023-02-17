@@ -1,0 +1,13 @@
+FROM mysql/mysql-server:5.7
+
+ARG MYSQL_DATABASE
+ARG MYSQL_PASSWORD
+ARG MYSQL_ROOT_PASSWORD
+ARG MYSQL_USER
+
+ENV MYSQL_DATABASE ${MYSQL_DATABASE:-transact_db}
+ENV MYSQL_PASSWORD ${MYSQL_PASSWORD:-secret}
+ENV MYSQL_ROOT_PASSWORD ${MYSQL_ROOT_PASSWORD:-secret}
+ENV MYSQL_USER ${MYSQL_USER:-transact_admin}
+
+COPY ./scripts/privileges.sql /docker-entrypoint-initdb.d/
